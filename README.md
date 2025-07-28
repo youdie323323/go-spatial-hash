@@ -1,0 +1,127 @@
+# go-spatial-hash
+
+Efficient, thread-safe 2D spatial hashing for Go. Useful for collision detection, spatial queries, and large-scale simulations.
+
+## Installation
+
+```
+go get github.com/youdie323323/go-spatial-hash
+```
+
+## Example
+
+See `spatial_hash_test.go` for a complete demo.
+
+## Usage
+
+### 1. Define Your Node Type
+
+Implement the `Node[Id, N]` interface for your entities. Here’s an example using integer id and float32 coordinates:
+
+```go
+type MyNode struct {
+    id    int
+    x, y  float32
+    oldX, oldY float32
+}
+
+func (n *MyNode) GetId() int              { return n.id }
+
+func (n *MyNode) GetX() float32           { return n.x }
+func (n *MyNode) GetY() float32           { return n.y }
+
+func (n *MyNode) SetOldPos(x, y float32)  { n.oldX, n.oldY = x, y }
+func (n *MyNode) GetOldPos() (float32, float32) { return n.oldX, n.oldY }
+```
+
+> **Tip:** You can use any comparable type for the ID (`string`, `int`, etc), and any `constraints.Integer` or `constraints.Float` for coordinates.
+
+### 2. Create a SpatialHash
+
+For `int` ID and `float32` coordinates with cell size `512`:
+
+```go
+sh := collision.NewSpatialHash[int, float32](512)
+```
+
+### 3. Add Nodes
+
+```go
+node := &MyNode{id: 1, x: 12.3, y: 45.6}
+
+sh.Put(node)
+```
+
+### 4. Update Node Positions
+
+Before moving a node, be sure to call `SetOldPos()` with the previous position, and then `Update()`:
+
+```go
+node.SetOldPos(node.x, node.y)
+
+node.x = 30.0
+node.y = 60.0
+
+sh.Update(node)
+```
+
+### 5. Search Nearby Nodes
+
+To find all nodes within a radius (e.g., 5 units):
+
+```go
+result := sh.Search(30, 60, 5)
+
+for _, n := range result {
+    // Use n (type Node[int, float32])
+}
+```
+
+### 6. Rectangular Area Query
+
+Example:
+
+```go
+x, y := 100, 100
+width, height := 50, 20
+
+results := sh.QueryRect(x, y, width, height)
+
+for _, n := range result {
+    // Use n (type Node[int, float32])
+}
+```
+
+### 7. Remove or Reset
+
+Remove a node:
+
+```go
+sh.Remove(node)
+```
+
+Reset all:
+
+```go
+sh.Reset()
+```
+
+## Performance
+
+| Test Case | Configuration | Naive Search | Spatial Hash | Speedup |
+|-----------|--------------|--------------|--------------|---------|
+| **Small World** | • 100 nodes<br>• 10 radius<br>• 20 cell size<br>• 200x200 area | 1.5409ms<br>(0.75 nodes/search) | 6.1487ms<br>(0.75 nodes/search) | 0.25x |
+| **Dense Population** | • 10000 nodes<br>• 100 radius<br>• 100 cell size<br>• 1000x1000 area | 18.2067ms<br>(286.38 nodes/search) | 23.8628ms<br>(286.38 nodes/search) | 0.76x |
+| **Sparse Population** | • 1000 nodes<br>• 20 radius<br>• 50 cell size<br>• 2000x2000 area | 7.6605ms<br>(0.31 nodes/search) | 3.0172ms<br>(0.31 nodes/search) | 2.54x |
+| **Large World** | • 50000 nodes<br>• 50 radius<br>• 100 cell size<br>• 5000x5000 area | 28.6073ms<br>(15.28 nodes/search) | 4.5592ms<br>(15.28 nodes/search) | 6.27x |
+| **Cell Size Impact (Small)** | • 1000 nodes<br>• 30 radius<br>• 10 cell size<br>• 500x500 area | 1.5118ms<br>(10.73 nodes/search) | 6.7369ms<br>(10.73 nodes/search) | 0.22x |
+| **Cell Size Impact (Large)** | • 1000 nodes<br>• 30 radius<br>• 200 cell size<br>• 500x500 area | 2.0324ms<br>(10.62 nodes/search) | 3.0447ms<br>(10.62 nodes/search) | 0.67x |
+
+The spatial hash implementation shines particularly in scenarios with a large number of nodes spread out over a large area, especially when the search radius is moderate. For example, in a "Large World" with 50,000 nodes and a radius of 50 units, the spatial hash was over **6 times faster** than a naive brute-force search. This demonstrates its efficiency when dealing with high-density datasets and larger spatial extents.
+
+However, for very small or very dense worlds with small numbers of nodes or very small search radii, the spatial hash may not outperform naive searching due to overhead. Similarly, when cells are made extremely small or very large relative to the radius and node distribution, performance can degrade and even become slower than naive search.
+
+## Credits
+
+- [xsync](https://github.com/puzpuzpuz/xsync)
+- [zeropool](https://github.com/colega/zeropool)
