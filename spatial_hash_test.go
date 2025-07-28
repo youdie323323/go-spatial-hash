@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-type TestNode = Node[int, float64]
+type TestingNode = Node[int, float64]
 
 // Point is a basic implementation of the Node interface for testing.
 type Point struct {
@@ -29,7 +29,7 @@ func newPoint(id int, x, y float64) *Point {
 	}
 }
 
-var _ TestNode = (*Point)(nil) // *Point must implement TestNode
+var _ TestingNode = (*Point)(nil) // *Point must implement TestingNode
 
 func (n *Point) GetId() int { return n.id }
 
