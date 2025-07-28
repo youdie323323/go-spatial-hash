@@ -8,6 +8,11 @@ Efficient, thread-safe 2D spatial hashing for Go. Useful for collision detection
 go get github.com/youdie323323/go-spatial-hash
 ```
 
+Then import: 
+```
+import "github.com/youdie323323/go-spatial-hash"
+```
+
 ## Example
 
 See `spatial_hash_test.go` for a complete demo.
@@ -41,7 +46,7 @@ func (n *MyNode) GetOldPos() (float32, float32) { return n.oldX, n.oldY }
 For `int` ID and `float32` coordinates with cell size `512`:
 
 ```go
-sh := collision.NewSpatialHash[int, float32](512)
+sh := spatial_hash.NewSpatialHash[int, float32](512)
 ```
 
 ### 3. Add Nodes
