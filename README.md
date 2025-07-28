@@ -113,16 +113,18 @@ sh.Reset()
 
 ## Performance
 
-| Test Case | Configuration | Naive Search | Spatial Hash | Speedup |
-|-----------|--------------|--------------|--------------|---------|
-| **Small World** | • 100 nodes<br>• 10 radius<br>• 20 cell size<br>• 200x200 area | 1.5409ms<br>(0.75 nodes/search) | 6.1487ms<br>(0.75 nodes/search) | 0.25x |
-| **Dense Population** | • 10000 nodes<br>• 100 radius<br>• 100 cell size<br>• 1000x1000 area | 18.2067ms<br>(286.38 nodes/search) | 23.8628ms<br>(286.38 nodes/search) | 0.76x |
-| **Sparse Population** | • 1000 nodes<br>• 20 radius<br>• 50 cell size<br>• 2000x2000 area | 7.6605ms<br>(0.31 nodes/search) | 3.0172ms<br>(0.31 nodes/search) | 2.54x |
-| **Large World** | • 50000 nodes<br>• 50 radius<br>• 100 cell size<br>• 5000x5000 area | 28.6073ms<br>(15.28 nodes/search) | 4.5592ms<br>(15.28 nodes/search) | 6.27x |
-| **Cell Size Impact (Small)** | • 1000 nodes<br>• 30 radius<br>• 10 cell size<br>• 500x500 area | 1.5118ms<br>(10.73 nodes/search) | 6.7369ms<br>(10.73 nodes/search) | 0.22x |
-| **Cell Size Impact (Large)** | • 1000 nodes<br>• 30 radius<br>• 200 cell size<br>• 500x500 area | 2.0324ms<br>(10.62 nodes/search) | 3.0447ms<br>(10.62 nodes/search) | 0.67x |
+Searched 100000 times with every test case:
 
-The spatial hash implementation shines particularly in scenarios with a large number of nodes spread out over a large area, especially when the search radius is moderate. For example, in a "Large World" with 50,000 nodes and a radius of 50 units, the spatial hash was over **6 times faster** than a naive brute-force search. This demonstrates its efficiency when dealing with high-density datasets and larger spatial extents.
+| Test Case                     | Configuration                                     | Naive Search                  | Spatial Hash                 | Speedup |
+|-------------------------------|-------------------------------------------------|------------------------------|------------------------------|---------|
+| **Small World**               | • 100 nodes<br>• 10 radius<br>• 20 cell size<br>• 200x200 area | 12.9305ms<br>(0.75 nodes/search)     | 66.4305ms<br>(0.75 nodes/search)     | 0.19x   |
+| **Dense Population**          | • 10000 nodes<br>• 100 radius<br>• 100 cell size<br>• 1000x1000 area | 1.6372018s<br>(288.03 nodes/search)  | 1.9398321s<br>(288.03 nodes/search)  | 0.84x   |
+| **Sparse Population**         | • 1000 nodes<br>• 20 radius<br>• 50 cell size<br>• 2000x2000 area   | 103.5732ms<br>(0.31 nodes/search)    | 50.4724ms<br>(0.31 nodes/search)     | 2.05x   |
+| **Large World**               | • 50000 nodes<br>• 50 radius<br>• 100 cell size<br>• 5000x5000 area | 5.1582745s<br>(15.58 nodes/search)   | 400.4354ms<br>(15.58 nodes/search)   | 12.88x  |
+| **Cell Size Impact (Small)**  | • 1000 nodes<br>• 30 radius<br>• 10 cell size<br>• 500x500 area     | 132.5948ms<br>(10.73 nodes/search)   | 541.6252ms<br>(10.73 nodes/search)   | 0.24x   |
+| **Cell Size Impact (Large)**  | • 1000 nodes<br>• 30 radius<br>• 200 cell size<br>• 500x500 area    | 137.4753ms<br>(10.71 nodes/search)   | 215.0451ms<br>(10.71 nodes/search)   | 0.64x   |
+
+The spatial hash implementation shines particularly in scenarios with a large number of nodes spread out over a large area, especially when the search radius is moderate. For example, in a "Large World" with 50,000 nodes and a radius of 50 units, the spatial hash was over **10±5 times faster** than a naive brute-force search. This demonstrates its efficiency when dealing with high-density datasets and larger spatial extents.
 
 However, for very small or very dense worlds with small numbers of nodes or very small search radii, the spatial hash may not outperform naive searching due to overhead. Similarly, when cells are made extremely small or very large relative to the radius and node distribution, performance can degrade and even become slower than naive search.
 
