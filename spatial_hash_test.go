@@ -35,14 +35,16 @@ func CreateTestNodes(count int, maxX, maxY float64) []*Point {
 	nodes := make([]*Point, count)
 
 	for i := range count {
+		x, y := maxX*rand.Float64(), maxY*rand.Float64()
+
 		nodes[i] = &Point{
 			id: i,
 
-			x: maxX * rand.Float64(),
-			y: maxY * rand.Float64(),
+			x: x,
+			y: y,
 
-			oldX: 0,
-			oldY: 0,
+			oldX: x,
+			oldY: y,
 		}
 	}
 
@@ -67,73 +69,61 @@ func NaiveSearch(nodes []*Point, x, y, radius float64) []*Point {
 	return result
 }
 
-const (
-	areaSize  = 1000
-	areaSize2 = areaSize / 2
-
-	cellSize = 100
-)
-
 type Position = [2]float64
 
 func TestSpatialHashPerformance(t *testing.T) {
 	testCases := []struct {
-		name       string
-		nodeCount  int
-		radius     float64
-		cellSize   float64
-		iterations int
-		areaSize   float64
+		name      string
+		nodeCount int
+		radius    float64
+		cellSize  float64
+		areaSize  float64
 	}{
 		{
-			name:       "Small World (100 nodes, small radius)",
-			nodeCount:  100,
-			radius:     10,
-			cellSize:   20,
-			iterations: 10000,
-			areaSize:   200,
+			name:      "Small World (100 nodes, small radius)",
+			nodeCount: 100,
+			radius:    10,
+			cellSize:  20,
+			areaSize:  200,
 		},
 		{
-			name:       "Dense Population (10000 nodes, large radius)",
-			nodeCount:  10000,
-			radius:     100,
-			cellSize:   100,
-			iterations: 1000,
-			areaSize:   1000,
+			name:      "Dense Population (10000 nodes, large radius)",
+			nodeCount: 10000,
+			radius:    100,
+			cellSize:  100,
+			areaSize:  1000,
 		},
 		{
-			name:       "Sparse Population (1000 nodes, small radius)",
-			nodeCount:  1000,
-			radius:     20,
-			cellSize:   50,
-			iterations: 5000,
-			areaSize:   2000,
+			name:      "Sparse Population (1000 nodes, small radius)",
+			nodeCount: 1000,
+			radius:    20,
+			cellSize:  50,
+			areaSize:  2000,
 		},
 		{
-			name:       "Large World (50000 nodes, medium radius)",
-			nodeCount:  50000,
-			radius:     50,
-			cellSize:   100,
-			iterations: 500,
-			areaSize:   5000,
+			name:      "Large World (50000 nodes, medium radius)",
+			nodeCount: 50000,
+			radius:    50,
+			cellSize:  100,
+			areaSize:  5000,
 		},
 		{
-			name:       "Cell Size Impact (1000 nodes, very small cells)",
-			nodeCount:  1000,
-			radius:     30,
-			cellSize:   10,
-			iterations: 1000,
-			areaSize:   500,
+			name:      "Cell Size Impact (1000 nodes, very small cells)",
+			nodeCount: 1000,
+			radius:    30,
+			cellSize:  10,
+			areaSize:  500,
 		},
 		{
-			name:       "Cell Size Impact (1000 nodes, very large cells)",
-			nodeCount:  1000,
-			radius:     30,
-			cellSize:   200,
-			iterations: 1000,
-			areaSize:   500,
+			name:      "Cell Size Impact (1000 nodes, very large cells)",
+			nodeCount: 1000,
+			radius:    30,
+			cellSize:  200,
+			areaSize:  500,
 		},
 	}
+
+	const numSearch = 100000
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -147,9 +137,9 @@ func TestSpatialHashPerformance(t *testing.T) {
 			}
 
 			// Prepare random search positions
-			searchPositions := make([]Position, tc.iterations)
+			searchPositions := make([]Position, numSearch)
 
-			for i := range tc.iterations {
+			for i := range numSearch {
 				searchPositions[i] = Position{
 					tc.areaSize * rand.Float64(),
 					tc.areaSize * rand.Float64(),
@@ -183,7 +173,7 @@ func TestSpatialHashPerformance(t *testing.T) {
 			hashDuration := time.Since(start)
 
 			// Calculate statistics
-			avgNodesFoundPerSearch := float64(totalFoundNaive) / float64(tc.iterations)
+			avgNodesFoundPerSearch := float64(totalFoundNaive) / float64(numSearch)
 			speedup := float64(naiveDuration) / float64(hashDuration)
 
 			fmt.Printf("Test Case: %s\n", tc.name)
@@ -195,7 +185,7 @@ func TestSpatialHashPerformance(t *testing.T) {
 				naiveDuration, avgNodesFoundPerSearch)
 
 			fmt.Printf("Spatial Hash: %v (%.2f nodes/search)\n",
-				hashDuration, float64(totalFoundHash)/float64(tc.iterations))
+				hashDuration, float64(totalFoundHash)/float64(numSearch))
 
 			fmt.Printf("Speedup: %.2fx\n\n", speedup)
 
@@ -217,7 +207,7 @@ func TestSpatialHashUpdate(t *testing.T) {
 		y: 100,
 	}
 
-	sh := NewSpatialHash[int, float64](cellSize)
+	sh := NewSpatialHash[int, float64](100)
 
 	sh.Put(node)
 
