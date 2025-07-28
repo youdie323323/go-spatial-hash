@@ -9,7 +9,7 @@ import (
 
 type TestNode = Node[int, float64]
 
-// Point is a basic implementation of the Node interface for testing
+// Point is a basic implementation of the Node interface for testing.
 type Point struct {
 	id int
 
@@ -30,7 +30,7 @@ func (n *Point) SetOldPos(x, y float64) {
 	n.oldY = y
 }
 
-// CreateTestNodes creates a slice of test nodes with random positions
+// CreateTestNodes creates a slice of test nodes with random positions.
 func CreateTestNodes(count int, maxX, maxY float64) []*Point {
 	nodes := make([]*Point, count)
 
@@ -49,7 +49,7 @@ func CreateTestNodes(count int, maxX, maxY float64) []*Point {
 	return nodes
 }
 
-// NaiveSearch performs a brute-force search for nodes within radius
+// NaiveSearch performs a brute-force search for nodes within radius.
 func NaiveSearch(nodes []*Point, x, y, radius float64) []*Point {
 	var result []*Point
 
