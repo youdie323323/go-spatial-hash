@@ -17,6 +17,18 @@ type Point struct {
 	oldX, oldY float64
 }
 
+func newPoint(id int, x, y float64) *Point {
+	return &Point{
+		id: id,
+
+		x: x,
+		y: y,
+
+		oldX: x,
+		oldY: y,
+	}
+}
+
 var _ TestNode = (*Point)(nil) // *Point must implement TestNode
 
 func (n *Point) GetId() int { return n.id }
@@ -37,15 +49,7 @@ func CreateTestNodes(count int, maxX, maxY float64) []*Point {
 	for i := range count {
 		x, y := maxX*rand.Float64(), maxY*rand.Float64()
 
-		nodes[i] = &Point{
-			id: i,
-
-			x: x,
-			y: y,
-
-			oldX: x,
-			oldY: y,
-		}
+		nodes[i] = newPoint(i, x, y)
 	}
 
 	return nodes
@@ -200,12 +204,7 @@ func TestSpatialHashPerformance(t *testing.T) {
 
 func TestSpatialHashUpdate(t *testing.T) {
 	// Create a single test node
-	node := &Point{
-		id: 1,
-
-		x: 100,
-		y: 100,
-	}
+	node := newPoint(1, 100, 100)
 
 	sh := NewSpatialHash[int, float64](100)
 
