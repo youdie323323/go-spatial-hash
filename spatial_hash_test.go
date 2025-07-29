@@ -36,11 +36,8 @@ func (n *Point) GetId() int { return n.id }
 func (n *Point) GetX() float64 { return n.x }
 func (n *Point) GetY() float64 { return n.y }
 
+func (n *Point) SetOldPos(x, y float64) { n.oldX, n.oldY = x, y }
 func (n *Point) GetOldPos() (float64, float64) { return n.oldX, n.oldY }
-func (n *Point) SetOldPos(x, y float64) {
-	n.oldX = x
-	n.oldY = y
-}
 
 // CreateTestNodes creates a slice of test nodes with random positions.
 func CreateTestNodes(count int, maxX, maxY float64) []*Point {
