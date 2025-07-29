@@ -115,8 +115,8 @@ sh.Reset()
 
 The `localizedRemove` option, configurable via `NewSpatialHashWithOptions`, controls how the `Remove` method behaves:
 
-- **When `true`** (default): The `Remove` method calculates the node's current cell based on its position and removes it only from that cell's bucket. This is faster but may lead to node duplication in rare cases due to concurrent updates (e.g., if a node's position changes simultaneously in another thread, it might not be removed from its previous cell).
-- **When `false`**: The `Remove` method iterates through all buckets to find and remove the node, ensuring no duplicates remain. This is safer in concurrent environments but slower, especially with many buckets.
+- **When `true`** (default): The `Remove` method calculates the node's current cell based on its position and removes it only from that cell's bucket. This is faster but may lead to node duplication in rare cases due to concurrent updates (e.g., if a node's position changes simultaneously in another thread, it might not be removed from its previous cell). <br/> Time complexity: \$<mi>&#x1D4AA;</mi>(1)$
+- **When `false`**: The `Remove` method iterates through all buckets to find and remove the node, ensuring no duplicates remain. This is safer in concurrent environments but slower, especially with many buckets. <br/> Time complexity: \$<mi>&#x1D4AA;</mi>(\text{BucketNum})$
 
 Choose `localizedRemove: true` for better performance when thread-safety for removals is not a concern or when you can guarantee nodes are not updated concurrently during removal. Use `localizedRemove: false` for maximum correctness in highly concurrent scenarios.
 
