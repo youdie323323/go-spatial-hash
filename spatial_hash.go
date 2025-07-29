@@ -91,9 +91,11 @@ func pairPoint(x, y int) int {
 }
 
 func (sh *SpatialHash[Id, N]) calculatePositionKey(x, y N) int {
+	cellSize := sh.cellSize
+
 	return pairPoint(
-		int(math.Floor(float64(x/sh.cellSize))),
-		int(math.Floor(float64(y/sh.cellSize))),
+		int(math.Floor(float64(x/cellSize))),
+		int(math.Floor(float64(y/cellSize))),
 	)
 }
 
