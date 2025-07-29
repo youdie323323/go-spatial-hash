@@ -124,10 +124,10 @@ Example:
 
 ```go
 // High-performance, but potential for duplicates in concurrent scenarios
+// This is default option for NewSpatialHash
 sh := spatial_hash.NewSpatialHashWithOptions[int, float32](512, true)
 
 // Safer for concurrent environments, but slower
-// This is option is default of NewSpatialHash
 sh := spatial_hash.NewSpatialHashWithOptions[int, float32](512, false)
 ```
 
