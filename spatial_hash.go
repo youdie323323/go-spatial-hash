@@ -117,7 +117,7 @@ func (sh *SpatialHash[Id, N]) Put(n Node[Id, N]) {
 
 // LocalizedRemove whether Remove(n) should calculate key of node and delete only once 
 // from one bucket, instead of iterating all the buckets.
-// This will improve performance but may cause bugs (due to timing).
+// This will improve performance but may cause node duplication (due to timing).
 const LocalizedRemove = false
 
 // Remove removes a node from the spatial hash.
