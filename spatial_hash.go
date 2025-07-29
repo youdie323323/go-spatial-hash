@@ -113,13 +113,26 @@ func (sh *SpatialHash[Id, N]) Put(n Node[Id, N]) {
 	bucket.Add(n)
 }
 
+// LocalizedRemove whether Remove(n) should calculate key of node and delete only once 
+// from one bucket, instead of iterating all the buckets.
+// This will improve performance but may cause bugs (due to timing).
+const LocalizedRemove = false
+
 // Remove removes a node from the spatial hash.
 func (sh *SpatialHash[Id, N]) Remove(n Node[Id, N]) {
-	x, y := n.GetX(), n.GetY()
-	key := sh.calculatePositionKey(x, y)
+	if LocalizedRemove {
+		x, y := n.GetX(), n.GetY()
+		key := sh.calculatePositionKey(x, y)
 
-	if bucket, ok := sh.buckets.Load(key); ok {
-		bucket.Delete(n)
+		if bucket, ok := sh.buckets.Load(key); ok {
+			bucket.Delete(n)
+		}
+	} else {
+		sh.buckets.Range(func(_ int, s *bucket[Id, N]) bool {
+			s.Delete(n)
+
+			return true
+		})
 	}
 }
 
