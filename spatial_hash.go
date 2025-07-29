@@ -153,12 +153,14 @@ func (sh *SpatialHash[Id, N]) Update(n Node[Id, N]) {
 
 // Search searches all nodes within the radius.
 func (sh *SpatialHash[Id, N]) Search(x, y, radius N) NodeSlice[Id, N] {
+	cellSize := sh.cellSize
+
 	radiusSq := radius * radius
 
-	minX := int(math.Floor(float64((x - radius) / sh.cellSize)))
-	maxX := int(math.Floor(float64((x + radius) / sh.cellSize)))
-	minY := int(math.Floor(float64((y - radius) / sh.cellSize)))
-	maxY := int(math.Floor(float64((y + radius) / sh.cellSize)))
+	minX := int(math.Floor(float64((x - radius) / cellSize)))
+	maxX := int(math.Floor(float64((x + radius) / cellSize)))
+	minY := int(math.Floor(float64((y - radius) / cellSize)))
+	maxY := int(math.Floor(float64((y + radius) / cellSize)))
 
 	result := sh.nodePool.Get()
 	nodes := result[:0]
@@ -192,13 +194,15 @@ func (sh *SpatialHash[Id, N]) Search(x, y, radius N) NodeSlice[Id, N] {
 
 // QueryRect queries all nodes within the specified rectangular area centered on a point.
 func (sh *SpatialHash[Id, N]) QueryRect(x, y, width, height N) NodeSlice[Id, N] {
+	cellSize := sh.cellSize
+
 	halfWidth := width / N(2)
 	halfHeight := height / N(2)
 
-	minX := int(math.Floor(float64((x - halfWidth) / sh.cellSize)))
-	maxX := int(math.Floor(float64((x + halfWidth) / sh.cellSize)))
-	minY := int(math.Floor(float64((y - halfHeight) / sh.cellSize)))
-	maxY := int(math.Floor(float64((y + halfHeight) / sh.cellSize)))
+	minX := int(math.Floor(float64((x - halfWidth) / cellSize)))
+	maxX := int(math.Floor(float64((x + halfWidth) / cellSize)))
+	minY := int(math.Floor(float64((y - halfHeight) / cellSize)))
+	maxY := int(math.Floor(float64((y + halfHeight) / cellSize)))
 
 	result := sh.nodePool.Get()
 	nodes := result[:0]
