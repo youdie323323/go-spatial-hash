@@ -49,17 +49,29 @@ type SpatialHash[Id comparable, N Number] struct {
 	buckets  *xsync.Map[int, *bucket[Id, N]]
 
 	nodePool zeropool.Pool[NodeSlice[Id, N]]
+
+	// localizedRemove is whether Remove(n) should calculate key of node and delete only once
+	// from one bucket, instead of iterating all the buckets.
+	// This will improve performance but may cause node duplication (due to timing).
+	// If you not want to consider timing, set this option to true.
+	localizedRemove bool
 }
 
-// NewSpatialHash creates a new spatial hash.
-func NewSpatialHash[Id comparable, N Number](cellSize N) *SpatialHash[Id, N] {
+// NewSpatialHashWithOptions creates a new spatial hash with configurable options.
+func NewSpatialHashWithOptions[Id comparable, N Number](cellSize N, localizedRemove bool) *SpatialHash[Id, N] {
 	return &SpatialHash[Id, N]{
 		cellSize: cellSize,
 		buckets:  xsync.NewMap[int, *bucket[Id, N]](),
 
 		// TODO: automatically calculate pool size from cell size
 		nodePool: zeropool.New(func() NodeSlice[Id, N] { return make(NodeSlice[Id, N], 64) }),
+
+		localizedRemove: localizedRemove,
 	}
+}
+
+func NewSpatialHash[Id comparable, N Number](cellSize N) *SpatialHash[Id, N] {
+	return NewSpatialHashWithOptions[Id](cellSize, true)
 }
 
 // bucket is a thread-safe set implementation for Node objects.
@@ -115,14 +127,9 @@ func (sh *SpatialHash[Id, N]) Put(n Node[Id, N]) {
 	bucket.Add(n)
 }
 
-// LocalizedRemove whether Remove(n) should calculate key of node and delete only once 
-// from one bucket, instead of iterating all the buckets.
-// This will improve performance but may cause node duplication (due to timing).
-const LocalizedRemove = false
-
 // Remove removes a node from the spatial hash.
 func (sh *SpatialHash[Id, N]) Remove(n Node[Id, N]) {
-	if LocalizedRemove {
+	if sh.localizedRemove {
 		x, y := n.GetX(), n.GetY()
 		key := sh.calculatePositionKey(x, y)
 
